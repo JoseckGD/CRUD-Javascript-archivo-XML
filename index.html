@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<head>
+    <title> CRUD en XML </title>
+    <link rel='stylesheet' type='text/css' href='css/style.css'>
+    <link href="https://fonts.googleapis.com/css?family=Lobster" rel="stylesheet" type="text/css">
+</head>
+<body>
+<section >
+    <div class="titulo">
+        <h1>Administración CRUD de un Repositorio en XML</h1>
+    </div>
+    <table>
+        <caption>
+            <h1>BookStore</h1>
+        </caption>
+        <thead>
+            <th >Id</th>
+            <th >Categoria</th>
+            <th >Titulo</th>
+            <th >Autor</th>
+            <th >Año</th>
+            <th >Precio</th>
+        </thead>
+        
+        <tbody id="tbody">
+            
+        </table>
+
+        <div class="btnMain">
+            <button onclick="createForm()" class="btnCraer">Crear</button>
+            <div class="in2" id="">
+                <input type="number" id="idSearch" required>
+                <label for="">Buscar por ID</label>
+            </div>
+            <button onclick="Search(document.getElementById('idSearch').value)" class="btnSearch">Buscar</button>
+            <button onclick="ReloadT(); document.getElementById('idSearch').value='';" class="btnAll">Todos</button>
+        </div>
+
+</section>
+
+<section class="form" id="form">
+    <div class="titulo2" id="titulo2">
+        <h1>Añadir Libro</h1>
+    </div>
+    <form action="" >
+        <div class="in" id="campoID">
+            <input type="text" id="id" required >
+            <label for="" id="labelId">Id</label>
+        </div>
+        <div class="in">
+            <input type="text" id="category" required>
+            <label for="">Categoria</label>
+        </div>
+        <div class="in">
+            <input type="text" id="title" required>
+            <label for="">Titulo</label>
+        </div>
+        <div class="in">
+            <input type="text" id="Author" required>
+            <label for="">Autor</label>
+        </div>
+        <div class="in">
+            <input type="number" id="Year" required>
+            <label for="">Año</label>
+        </div>
+        <div class="in">
+            <input type="number" id="Price" required>
+            <label for="">Precio</label>
+        </div>
+    </form>
+    <div class="btnFin">
+    <button class="btnGA" id="btnGuardar" onclick="Update(document.getElementById('id').value)">Guardar</button>
+    <button class="btnReset" onclick="Reset()" >Reiniciar</button>
+    <button class="btnCerrar" onclick="document.getElementById('form').style.display='none'" >Cerrar</button>
+    </div>
+
+</section>
+
+<script>
+    document.getElementById('form').style.display='none';
+
+    
+    var xhttp, bookG;
+    xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            myFuntion(this);
+        }
+    };
+    xhttp.open("GET", "books.xml", true);
+    xhttp.send();
+
+    function Update(id){
+
+        if (confirm("¿ Realmente desea MODIFICAR el Libro con el ID: "+id+" ?")) {
+            var newCategory = document.getElementById('category').value;
+            var newTitle = document.getElementById('title').value;
+            var newAuthor = document.getElementById('Author').value;
+            var newYear = document.getElementById('Year').value;
+            var newPrice = document.getElementById('Price').value;
+
+            var xBook = bookG.getElementsByTagName("book"); 
+            var xTitle = bookG.getElementsByTagName("title");
+            var xAuthor = bookG.getElementsByTagName("author");
+            var xYear = bookG.getElementsByTagName("year");
+            var xPrice = bookG.getElementsByTagName("price");
+
+            xBook[id].setAttribute("category", newCategory);
+            xTitle[id].childNodes[0].nodeValue = newTitle; 
+            xAuthor[id].childNodes[0].nodeValue = newAuthor; 
+            xYear[id].childNodes[0].nodeValue = newYear; 
+            xPrice[id].childNodes[0].nodeValue = newPrice; 
+
+            ReloadT();
+        }else{
+            alert('La accion a sido cancelada');
+        }
+        
+    }
+
+    function updateForm(id){
+        
+        document.getElementById("titulo2").innerHTML="<h1>Modificar Libro</h1>";
+        document.getElementById("btnGuardar").innerHTML="Guardar";
+        document.getElementById("btnGuardar").setAttribute("onclick","Update("+id+")");
+        
+        document.getElementById('campoID').style.display='block';
+        document.getElementById('form').style.display='block'; 
+        document.getElementById("id").value=id;
+        document.getElementById("id").setAttribute("readonly","");
+        document.getElementById("labelId").style.top='-25px';
+        document.getElementById("labelId").style.color='rgb(116, 207, 250)';
+        document.getElementById("labelId").style.fontWeight='700';
+        document.getElementById("labelId").style.background='#1B2631 ';
+        document.getElementById("id").style.background='#1B2631 ';
+        
+        document.getElementById('category').value="";
+        document.getElementById('title').value="";
+        document.getElementById('Author').value="";
+        document.getElementById('Year').value="";
+        document.getElementById('Price').value="";
+    }
+    
+    function Create(){
+
+    if (confirm("¿ Realmente desea AÑADIR un Libro ?")) {
+
+        var newCategory = document.getElementById('category').value;
+        var newTitle = document.getElementById('title').value;
+        var newAuthor = document.getElementById('Author').value;
+        var newYear = document.getElementById('Year').value;
+        var newPrice = document.getElementById('Price').value;
+
+    var mainBook = bookG.documentElement;
+
+        var newBook = bookG.createElement("book");
+        newBook.setAttribute("category", newCategory);
+
+        var newBookTitle = bookG.createElement("title");
+        var newTitleTxt = bookG.createTextNode(newTitle);
+        newBookTitle.appendChild(newTitleTxt);
+        newBook.appendChild(newBookTitle);
+
+        var newBookAutor = bookG.createElement("author");
+        var newAuthorTxt = bookG.createTextNode(newAuthor);
+        newBookAutor.appendChild(newAuthorTxt);
+        newBook.appendChild(newBookAutor);
+        
+        var newBookYear = bookG.createElement("year");
+        var newYearTxt = bookG.createTextNode(newYear);
+        newBookYear.appendChild(newYearTxt);
+        newBook.appendChild(newBookYear);
+
+        var newBookPrice = bookG.createElement("price");
+        var newPriceTxt = bookG.createTextNode(newPrice);
+        newBookPrice.appendChild(newPriceTxt);
+        newBook.appendChild(newBookPrice);
+
+        
+        var xBook = bookG.getElementsByTagName("book"); 
+    
+        mainBook.insertBefore(newBook, xBook.lastChild);
+        ReloadT();
+        Reset();
+    alert('Se añadio un Libro');
+    }else{
+            alert('La accion a sido cancelada');
+        }
+    }
+
+    function createForm(){
+
+        document.getElementById("titulo2").innerHTML="<h1>Añadir Libro</h1>";
+        document.getElementById('campoID').style.display='none';
+
+        document.getElementById('form').style.display='block';
+        document.getElementById("labelId").style.top='-25px';
+        document.getElementById("labelId").style.color='rgb(116, 207, 250)';
+        document.getElementById("labelId").style.fontWeight='700';
+        document.getElementById("labelId").style.background='#1B2631 ';
+        document.getElementById("id").style.background='#1B2631 ';
+
+        document.getElementById("btnGuardar").innerHTML="Añadir Libro";
+
+        document.getElementById("btnGuardar").setAttribute("onclick","Create()");
+
+    }
+
+    
+    function Delete(id){
+
+        if (confirm("¿ Realmente desea ELIMINAR el Libro con el ID: "+id+" ?")) {
+            var delBook = bookG.getElementsByTagName("book")[id];
+            bookG.documentElement.removeChild(delBook);
+            ReloadT();
+        }else{
+            alert('La accion a sido cancelada');
+        }
+    }
+
+
+    function Search(id){
+        var searchBook = bookG.getElementsByTagName("book")[id];
+
+        if(!searchBook){
+            alert("No existe el Libro");
+            document.getElementById('idSearch').value='';
+            ReloadT();
+        }else{
+
+        xBook = bookG.getElementsByTagName("book"); 
+        xTitle = bookG.getElementsByTagName("title");
+        xAuthor = bookG.getElementsByTagName("author");
+        xYear = bookG.getElementsByTagName("year");
+        xPrice = bookG.getElementsByTagName("price");
+
+        var tbody = document.getElementById('tbody');
+
+        var allTr = tbody.getElementsByTagName("tr");
+        var registros = allTr.length;
+        for(var i = 0; i<registros; i++){
+           tbody.removeChild(allTr[0]); 
+           allTr = tbody.getElementsByTagName("tr");
+        }
+
+            var newTr = document.createElement('tr');
+
+            var newTd_Id = document.createElement('td');
+            newTd_Id.innerHTML= id;
+
+            var newTd_Category = document.createElement('td');
+            newTd_Category.innerHTML= xBook[id].attributes.getNamedItem("category").nodeValue;
+
+            var newTd_Title = document.createElement('td');
+            newTd_Title.innerHTML= xTitle[id].childNodes[0].nodeValue;
+
+            var newTd_Author = document.createElement('td');
+            newTd_Author.innerHTML= xAuthor[id].childNodes[0].nodeValue;  
+
+            var newTd_Year = document.createElement('td');
+            newTd_Year.innerHTML= xYear[id].childNodes[0].nodeValue;
+
+            var newTd_Price = document.createElement('td');
+            newTd_Price.innerHTML=  "$" + xPrice[id].childNodes[0].nodeValue;
+
+            var newTd_btnModificar = document.createElement('td');
+            newTd_btnModificar.innerHTML= "<button onclick='updateForm("+id+")' class='btnMod'>Modificar</button>";
+
+            var newTd_btnEliminar = document.createElement('td');
+            newTd_btnEliminar.innerHTML= "<button onclick='Delete("+id+")' class='btnEli'>Eliminar</button>";
+
+            newTr.appendChild(newTd_Id);
+            newTr.appendChild(newTd_Category);
+            newTr.appendChild(newTd_Title);
+            newTr.appendChild(newTd_Author);
+            newTr.appendChild(newTd_Year);
+            newTr.appendChild(newTd_Price);
+            newTr.appendChild(newTd_btnModificar);
+            newTr.appendChild(newTd_btnEliminar);
+            tbody.appendChild(newTr);
+        }
+    }
+    
+    function myFuntion(xml) {
+        var xBook, xTitle, xAuthor, xYear, xPrice, xmlDoc, tr; 
+
+        xmlDoc = xml.responseXML;
+        xBook = xmlDoc.getElementsByTagName("book"); 
+
+        xTitle = xmlDoc.getElementsByTagName("title");
+        xAuthor = xmlDoc.getElementsByTagName("author");
+        xYear = xmlDoc.getElementsByTagName("year");
+        xPrice = xmlDoc.getElementsByTagName("price");
+
+        var tbody = document.getElementById('tbody');
+
+        var allTr = tbody.getElementsByTagName("tr");
+        if(allTr>1){
+            var registros = allTr.length;
+            for(var i = 0; i<registros+1; i++){
+                tbody.removeChild(allTr[0]); 
+            }
+        }
+        
+
+        for (var i = 0; i < xBook.length; i++) { 
+
+            var newTr = document.createElement('tr');
+
+            var newTd_Id = document.createElement('td');
+            newTd_Id.innerHTML= i;
+
+            var newTd_Category = document.createElement('td');
+            newTd_Category.innerHTML= xBook[i].attributes.getNamedItem("category").nodeValue;
+
+            var newTd_Title = document.createElement('td');
+            newTd_Title.innerHTML= xTitle[i].childNodes[0].nodeValue;
+
+            var newTd_Author = document.createElement('td');
+            newTd_Author.innerHTML= xAuthor[i].childNodes[0].nodeValue;  
+
+            var newTd_Year = document.createElement('td');
+            newTd_Year.innerHTML= xYear[i].childNodes[0].nodeValue;
+
+            var newTd_Price = document.createElement('td');
+            newTd_Price.innerHTML=  "$" + xPrice[i].childNodes[0].nodeValue;
+
+            var newTd_btnModificar = document.createElement('td');
+            newTd_btnModificar.innerHTML= "<button onclick='updateForm("+i+")' class='btnMod'>Modificar</button>";
+
+            var newTd_btnEliminar = document.createElement('td');
+            newTd_btnEliminar.innerHTML= "<button onclick='Delete("+i+")' class='btnEli'>Eliminar</button>";
+
+            newTr.appendChild(newTd_Id);
+            newTr.appendChild(newTd_Category);
+            newTr.appendChild(newTd_Title);
+            newTr.appendChild(newTd_Author);
+            newTr.appendChild(newTd_Year);
+            newTr.appendChild(newTd_Price);
+            newTr.appendChild(newTd_btnModificar);
+            newTr.appendChild(newTd_btnEliminar);
+            tbody.appendChild(newTr);
+        }
+        bookG = xml.responseXML;
+    }
+
+    function borrarT(){
+        var tbody = document.getElementById('tbody');
+
+        var allTr = tbody.getElementsByTagName("tr");
+        var registros = allTr.length;
+        for(var i = 0; i<registros+1; i++){
+           tbody.removeChild(allTr[0]); 
+        }
+
+        
+    }
+
+    function ReloadT() {
+        var xBook, xTitle, xAuthor, xYear, xPrice; 
+
+        xBook = bookG.getElementsByTagName("book"); 
+
+        xTitle = bookG.getElementsByTagName("title");
+        xAuthor = bookG.getElementsByTagName("author");
+        xYear = bookG.getElementsByTagName("year");
+        xPrice = bookG.getElementsByTagName("price");
+
+        var tbody = document.getElementById('tbody');
+
+        var allTr = tbody.getElementsByTagName("tr");
+        var registros = allTr.length;
+        for(var i = 0; i<registros; i++){
+           tbody.removeChild(allTr[0]); 
+           allTr = tbody.getElementsByTagName("tr");
+        }
+
+        for (var i = 0; i < xBook.length; i++) { 
+
+            var newTr = document.createElement('tr');
+
+            var newTd_Id = document.createElement('td');
+            newTd_Id.innerHTML= i;
+
+            var newTd_Category = document.createElement('td');
+            newTd_Category.innerHTML= xBook[i].attributes.getNamedItem("category").nodeValue;
+
+            var newTd_Title = document.createElement('td');
+            newTd_Title.innerHTML= xTitle[i].childNodes[0].nodeValue;
+
+            var newTd_Author = document.createElement('td');
+            newTd_Author.innerHTML= xAuthor[i].childNodes[0].nodeValue;  
+
+            var newTd_Year = document.createElement('td');
+            newTd_Year.innerHTML= xYear[i].childNodes[0].nodeValue;
+
+            var newTd_Price = document.createElement('td');
+            newTd_Price.innerHTML=  "$" + xPrice[i].childNodes[0].nodeValue;
+
+            var newTd_btnModificar = document.createElement('td');
+            newTd_btnModificar.innerHTML= "<button onclick='updateForm("+i+")' class='btnMod'>Modificar</button>";
+
+            var newTd_btnEliminar = document.createElement('td');
+            newTd_btnEliminar.innerHTML= "<button onclick='Delete("+i+")' class='btnEli'>Eliminar</button>";
+
+            newTr.appendChild(newTd_Id);
+            newTr.appendChild(newTd_Category);
+            newTr.appendChild(newTd_Title);
+            newTr.appendChild(newTd_Author);
+            newTr.appendChild(newTd_Year);
+            newTr.appendChild(newTd_Price);
+            newTr.appendChild(newTd_btnModificar);
+            newTr.appendChild(newTd_btnEliminar);
+            tbody.appendChild(newTr);
+        }
+    }
+
+    function Reset(){
+        document.getElementById('category').value="";
+        document.getElementById('title').value="";
+        document.getElementById('Author').value="";
+        document.getElementById('Year').value="";
+        document.getElementById('Price').value="";
+    }
+
+    </script>
+
+</body>
+</html>
+
+<!--<link href="https://fonts.googleapis.com/css?family=Lobster" rel="stylesheet" type="text/css">
+h2 {
+    font-family: Lobster, monospace;
+  }
+
+  .dodger-blue-text {
+    color: #1E90FF;
+  }
+
+  background: linear-gradient(35deg,#CCFFFF , #FFCCCC);
+-->
